@@ -1,0 +1,23 @@
+﻿<ConnectionComponent Id="PSM-ShopizerAdministrator" FullScreen="No" Height="768" Width="1024" EnableWindowScrollbar="No" EnableToolbars="No" DisplayName="" Type="CyberArk.PasswordVault.TransparentConnection.PSM.PSMConnectionComponent, CyberArk.PasswordVault.TransparentConnection.PSM">
+	<ComponentParameters />
+	<UserParameters>
+		<Parameter Name="AllowMappingLocalDrives" Type="CyberArk.TransparentConnection.BooleanUserParameter, CyberArk.PasswordVault.TransparentConnection" Value="No" Visible="No" Required="Yes" EnforceInDualControlRequest="No" />
+	</UserParameters>
+	<TargetSettings Protocol="HTTP" ClientApp="Edge" ClientDispatcher="&quot;{PSMComponentsFolder}\CyberArk.PSM.WebAppDispatcher.exe&quot; &quot;{PSMComponentsFolder}&quot;" ClientInvokeType="WebForm" ConnectionComponentInitTimeout="200000">
+		<ClientSpecific>
+			<Parameter Name="ActionTimeout" Value="10" />
+			<Parameter Name="PageLoadTimeout" Value="30" />
+			<Parameter Name="RunValidations" Value="yes" />
+			<Parameter Name="Browser" Value="Edge" />
+			<Parameter Name="BrowserPath" Value="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" />
+			<Parameter Name="EnableTrace" Value="no" />
+			<Parameter Name="Port" Value="4200" />
+		</ClientSpecific>
+		<LockAppWindow Enable="Yes" MainWindowClass="Chrome_WidgetWin_1" Timeout="20000" SearchWindowWaitTimeout="30" />
+		<WebFormSettings LogonURL="http://{Address}:{Port}/#/auth" FormName="Deprecated" WebFormFields="username&gt;{username} (SearchBy=name)&#xA;password&gt;{password} (SearchBy=name)&#xA;//button^[@type=&quot;submit&quot;^]&gt;(Button) (SearchBy=XPath)&#xA;Informations sur le magasin&gt;(Validation) (SearchBy=text)&#xA;Store information&gt;(Validation) (SearchBy=text)" EnforceCertificateValidation="Yes" />
+		<Capabilities>
+			<Capability Id="WindowsEventsAudit" />
+			<Capability Id="WindowsEventsTextRecorder" />
+		</Capabilities>
+	</TargetSettings>
+</ConnectionComponent>

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Device Name="Website"><Policies><Policy ID="TimSchindlerShopizerAdministratorAccounts" PlatformBaseID="GenericWebApp" PlatformBaseType="Website" PlatformBaseProtocol="Https" AutoChangeOnAdd="No" AutoVerifyOnAdd="No">
+          <Properties>
+            <Required>
+              <Property Name="Username" />
+              <Property Name="Address" />
+            </Required>
+            <Optional>
+              <Property Name="Port" />
+            </Optional>
+          </Properties>
+          <LinkedPasswords>
+            <Link Name="ReconcileAccount" PropertyIndex="3" />
+          </LinkedPasswords>
+          <TicketingSystem EnterTicketingInfo="No" ValidateTicketNumber="No" />
+        </Policy></Policies></Device>
