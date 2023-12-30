@@ -1,0 +1,72 @@
+﻿---
+services:
+  shopizer-db:
+    environment:
+      - MYSQL_ROOT_PASSWORD=shopizer123
+      - MYSQL_DATABASE=SALESMANAGER
+      - MYSQL_USER=shopizer_db_user
+      - MYSQL_PASSWORD=shopizer_db_password
+    image: mysql/mysql-server:8.0.28
+    container_name: shopizer-db
+    networks:
+      - shopizer-network
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./db:/var/lib/mysql
+  #Infinispan image management
+  shopizer:
+    depends_on:
+      - shopizer-db
+    image: shopizerecomm/shopizer:3.2.5
+    container_name: shopizer
+    environment:
+    - "SPRING_PROFILES_ACTIVE=mysql"
+    - "db.jdbcUrl=jdbc:mysql://shopizer-db:3306/SALESMANAGER?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8"
+    - "db.user=shopizer_db_user"
+    - "db.password=shopizer_db_password"
+    - "elasticsearch.security.password=NOTREQUIRED"
+    - "config.cms.contentUrl=http://localhost:8080"
+    - "config.cms.method=default"
+    - "elasticsearch.server.host=http://localhost"
+    - "elasticsearch.server.port=9200"
+    # The below 4 environmental variables are seemingly expected to be defined even though the config.cms.method is not aws
+    - "AWS_ACCESS_KEY_ID=YOUR-ACCESS-KEY"
+    - "AWS_SECRET_ACCESS_KEY=YOUR-SECRET-ACCESS-KEY"
+    - "config.cms.aws.bucket=your-bucket"
+    - "config.cms.aws.region=ca-central-1"
+    mem_limit: 2048m
+    networks:
+      - shopizer-network
+    links:
+      - shopizer-db
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./files:/files
+  shopizer-admin:
+    # This image is used instead of shopizerecomm/shopizer-admin:latest because it includes a fix for change password.
+    image: ghcr.io/aaearon/shopizer-admin:latest
+    container_name: shopizer-admin
+    environment:
+    # Change the below IP address to the IP address of your host machine.
+    - "APP_BASE_URL=http://192.168.178.61:8080/api"
+    networks:
+      - shopizer-network
+    ports:
+      - "4200:80"
+  shopizer-shop:
+    image: shopizerecomm/shopizer-shop-reactjs:latest
+    container_name: shopizer-shop
+    environment:
+    - "APP_MERCHANT=DEFAULT"
+    # Change the below IP address to the IP address of your host machine.
+    - "APP_BASE_URL=http://192.168.178.61:8080"
+    networks:
+      - shopizer-network
+    ports:
+      - "80:80"
+version: "2.2"
+
+networks:
+  shopizer-network:
