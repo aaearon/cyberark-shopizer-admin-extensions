@@ -2,7 +2,7 @@
 
 CyberArk PSM connector and CPM plugin for the Shopizer Administrator portal. These extensions were created as part of a [blog series](https://timschindler.blog/series/shopizer-admin-ext) that can be found at [https://timschindler.blog](https://timschindler.blog).
 
-# CyberArk PSM connection component
+## CyberArk PSM connection component
 
 Developed as part of the article [Creating a CyberArk Privileged Session Manager connection component for a web application](https://timschindler.blog/creating-a-cyberark-privileged-session-manager-connection-component-for-a-web-application).
 
@@ -14,7 +14,7 @@ The PSM connector is found in the `psm` folder. It contains the following file:
 
 ## CyberArk CPM plugin
 
-Developed as part of the article [Creating a CyberArk Central Policy Manager plugin for a web application]().
+Developed as part of the article [Creating a CyberArk Central Policy Manager plugin for a web application](https://timschindler.blog/creating-a-cyberark-central-policy-manager-plugin-for-a-web-application).
 
 The CPM plugin is found in the `cpm` folder. It contains the following files:
 
