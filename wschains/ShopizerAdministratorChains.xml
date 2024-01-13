@@ -33,6 +33,28 @@ File:				Chains
 			</request>
 		</RequestWrapper>
 		<RequestWrapper>
+			<request name="RecGetToken">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/login</endpoint>
+				<method>POST</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+			  </header>
+			  <body>
+				<json>
+					{
+						"username":"{{extrapass3\username}}",
+						"password":"{{pmextrapass3}}"
+					}
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<RequestWrapper>
 			<request name="GetUserByID">
 			<version>2</version>
 			  <general>
@@ -159,7 +181,7 @@ File:				Chains
 		</Chain>
 			<!--Reconcile Action -->
 		<Chain name="reconcilepass">
-			<Link name="ReconcilePasswordGetTokenLink" request="GetToken">
+			<Link name="ReconcilePasswordGetTokenLink" request="RecGetToken">
 				<StatusCode value="200" next="GetUserByIDLink">
 					<Parse name="parsed/token" type="json" value="token" secure="true" />
 				</StatusCode>
