@@ -74,6 +74,56 @@ File:				Chains
 			</request>
 		</RequestWrapper>
 		<RequestWrapper>
+			<request name="GetUserProfileByID">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/users/{{parsed/id}}</endpoint>
+				<method>GET</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+				<Authorization>Bearer {{parsed/token}}</Authorization>
+			 </header>
+			  <body>
+				<json>
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<RequestWrapper>
+			<request name="RecChangePassword">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/user/{{parsed/id}}</endpoint>
+				<method>PUT</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+				<Authorization>Bearer {{parsed/token}}</Authorization>
+			 </header>
+			  <body>
+				<json>
+				{
+					"active": {{parsed/active}},
+					"defaultLanguage": "{{parsed/defaultLanguage}}",
+					"firstName": "{{parsed/firstName}}",
+					"groups:": {{parsed/groups}},
+					"id": "{{parsed/id}}",
+					"lastName": "{{parsed/lastName}}",
+					"password": "{{pmnewpass}}",
+					"repeatPassword": "{{pmnewpass}}",
+					"store": "{{parsed/merchant}}",
+					"userName": "{{parsed/userName}}"
+				}
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<RequestWrapper>
 			<request name="ChangePassword">
 			<version>2</version>
 			  <general>
@@ -199,7 +249,7 @@ File:				Chains
 				<StatusCode value="200" next="ByParse" condition="OR" nomatch="FAILToParseRecUsername">
 					<Parse name="parsed/id" type="text" value="&quot;id&quot;:(\d+)(?=[^}]*&quot;userName&quot;:&quot;{{username}}&quot;)">
 						<Equals value="Success" next="END"/>
-						<Equals value="*" next="ReconcilePasswordLink"/>
+						<Equals value="*" next="GetUserProfileByIDLink"/>
 					</Parse>
 				</StatusCode>
 				<StatusCode value="400" next="FAILBadRequest"/>
@@ -212,7 +262,28 @@ File:				Chains
 				<StatusCode value="501" next="FAILWebServer"/>
 				<StatusCode value="*" next="FAILGeneral"/>
 			</Link>
-			<Link name="ReconcilePasswordLink" request="ChangePassword">
+			<Link name="GetUserProfileByIDLink" request="GetUserProfileByID">
+				<StatusCode value="200" next="ReconcilePasswordLink">
+					<Parse name="parsed/active" type="json" value="active" method="lowercase"/>
+					<Parse name="parsed/defaultLanguage" type="json" value="defaultLanguage" />
+					<Parse name="parsed/emailAddress" type="json" value="emailAddress" />
+					<Parse name="parsed/firstName" type="json" value="firstName" />
+					<Parse name="parsed/groups" type="text" value="&quot;groups&quot;:(\[[^\]]+\])" />
+					<Parse name="parsed/lastName" type="json" value="lastName" />
+					<Parse name="parsed/merchant" type="json" value="merchant" />
+					<Parse name="parsed/username" type="json" value="userName" />
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorized"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+			<Link name="ReconcilePasswordLink" request="RecChangePassword">
 				<StatusCode value="200" next="RecVerifyNewPassLink"/>
 				<StatusCode value="400" next="FAILBadRequest"/>
 				<StatusCode value="401" next="FAILUnauthorized"/>
