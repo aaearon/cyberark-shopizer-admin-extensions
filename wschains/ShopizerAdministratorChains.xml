@@ -3,7 +3,7 @@ Vendor:				ShopizerAdministrator
 Product:			Shopizer
 Version:			{Version}
 Plugin:				v1
-Reference:			https://timschindler.blog
+Reference:			https://timschindler.blog / https://github.com/aaearon/cyberark-shopizer-admin-extensions
 File:				Chains
 -->
 <WSChains name="ShopizerAdministrator">
@@ -73,6 +73,7 @@ File:				Chains
 			  </body>
 			</request>
 		</RequestWrapper>
+		<!-- This is needed to get the user's current profile information so we can send it as part of RecChangePassword -->
 		<RequestWrapper>
 			<request name="GetUserProfileByID">
 			<version>2</version>
@@ -108,15 +109,18 @@ File:				Chains
 			  <body>
 				<json>
 				{
+					<!-- No quotes because it needs to be treated as a bool -->
 					"active": {{parsed/active}},
 					"defaultLanguage": "{{parsed/defaultLanguage}}",
 					"firstName": "{{parsed/firstName}}",
+					<!-- The value for the groups key will be a string representation of the groups array. -->
 					"groups:": {{parsed/groups}},
 					"id": "{{parsed/id}}",
 					"lastName": "{{parsed/lastName}}",
 					"password": "{{pmnewpass}}",
 					"repeatPassword": "{{pmnewpass}}",
 					"store": "{{parsed/merchant}}",
+					"emailAddress": "shopizeradministrator@timschindler.dev",
 					"userName": "{{parsed/userName}}"
 				}
 				</json>
@@ -264,10 +268,12 @@ File:				Chains
 			</Link>
 			<Link name="GetUserProfileByIDLink" request="GetUserProfileByID">
 				<StatusCode value="200" next="ReconcilePasswordLink">
+					<!-- Uses method=lowercase as we later treat it as a bool. Works with at least v12.5.7.3 of WSChains.dll-->
 					<Parse name="parsed/active" type="json" value="active" method="lowercase"/>
 					<Parse name="parsed/defaultLanguage" type="json" value="defaultLanguage" />
 					<Parse name="parsed/emailAddress" type="json" value="emailAddress" />
 					<Parse name="parsed/firstName" type="json" value="firstName" />
+					<!-- Use regex to get the value of the groups key as when we parse it as type json, it cannot convert an Array to string. -->
 					<Parse name="parsed/groups" type="text" value="&quot;groups&quot;:(\[[^\]]+\])" />
 					<Parse name="parsed/lastName" type="json" value="lastName" />
 					<Parse name="parsed/merchant" type="json" value="merchant" />
