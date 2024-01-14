@@ -1,0 +1,320 @@
+<!--
+Vendor:				ShopizerAdministrator
+Product:			Shopizer
+Version:			{Version}
+Plugin:				v1
+Reference:			https://timschindler.blog / https://github.com/aaearon/cyberark-shopizer-admin-extensions
+File:				Chains
+-->
+<WSChains name="ShopizerAdministrator">
+	<GlobalSettings>
+	</GlobalSettings>
+	<Requests>
+		<RequestWrapper>
+			<request name="GetToken">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/login</endpoint>
+				<method>POST</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+			  </header>
+			  <body>
+				<json>
+					{
+						"username":"{{username}}",
+						"password":"{{pmpass}}"
+					}
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<RequestWrapper>
+			<request name="RecGetToken">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/login</endpoint>
+				<method>POST</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+			  </header>
+			  <body>
+				<json>
+					{
+						"username":"{{extrapass3\username}}",
+						"password":"{{pmextrapass3}}"
+					}
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<RequestWrapper>
+			<request name="GetUserByID">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/users</endpoint>
+				<method>GET</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+				<Authorization>Bearer {{parsed/token}}</Authorization>
+			 </header>
+			  <body>
+				<json>
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<!-- This is needed to get the user's current profile information so we can send it as part of RecChangePassword -->
+		<RequestWrapper>
+			<request name="GetUserProfileByID">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/users/{{parsed/id}}</endpoint>
+				<method>GET</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+				<Authorization>Bearer {{parsed/token}}</Authorization>
+			 </header>
+			  <body>
+				<json>
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<RequestWrapper>
+			<request name="RecChangePassword">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/user/{{parsed/id}}</endpoint>
+				<method>PUT</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+				<Authorization>Bearer {{parsed/token}}</Authorization>
+			 </header>
+			  <body>
+				<json>
+				{
+					<!-- No quotes because it needs to be treated as a bool -->
+					"active": {{parsed/active}},
+					"defaultLanguage": "{{parsed/defaultLanguage}}",
+					"firstName": "{{parsed/firstName}}",
+					<!-- The value for the groups key will be a string representation of the groups array. -->
+					"groups:": {{parsed/groups}},
+					"id": "{{parsed/id}}",
+					"lastName": "{{parsed/lastName}}",
+					"password": "{{pmnewpass}}",
+					"repeatPassword": "{{pmnewpass}}",
+					"store": "{{parsed/merchant}}",
+					"emailAddress": "shopizeradministrator@timschindler.dev",
+					"userName": "{{parsed/userName}}"
+				}
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+		<RequestWrapper>
+			<request name="ChangePassword">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/user/{{parsed/id}}/password</endpoint>
+				<method>PATCH</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+				<Authorization>Bearer {{parsed/token}}</Authorization>
+			  </header>
+			  <body>
+				<json>
+				  {
+				  "password": "{{pmpass}}",
+				  "changePassword": "{{pmnewpass}}"
+				  }
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
+	</Requests>
+
+	<!-- Fails are similar to a link with the next state of END except it ends unsuccessfully. Here you can specify the return code and pvwaMessage -->
+	<Fails>
+		<Fail name="FAILBadRequest" rc="8101" message="Status Code = 400. Bad Request" />
+		<Fail name="FAILUnauthorized" rc="8102" message="Status Code = 401. The request sent by the CPM could not be authenticated" />
+		<Fail name="FAILForbidden" rc="8103" message="Status Code = 403. Access to the requested (valid) URL by the client is forbidden" />
+		<Fail name="FAILNotFound" rc="8104" message="Status Code = 404. Resource not found." />
+		<Fail name="FAILMethodNotFound" rc="8105" message="Status Code = 405. Method not allowed." />
+		<Fail name="FAILRequestConflict" rc="8106" message="Status Code = 409. Request conflict with current state of the server" />
+		<Fail name="FAILInternalServerError" rc="8107" message="Status Code = 500. The server cannot process the request for an unknown reason" />
+		<Fail name="FAILWebServer" rc="8108" message="Status Code = 501. The server cannot process the request for an unknown reason" />
+		<Fail name="FAILGeneral" rc="8109" message="General Error. Check the logs for more information." />
+
+		<Fail name="FAILUnauthorizedCurrPass" rc="8110" message= "Failed to authenticate to the API using the target account username and current password. Status code 401." />
+		<Fail name="FAILUnauthorizedNewPass" rc="8111" message= "Failed to authenticate to the API using the target account username and new password. Status code 401." />
+		<Fail name="FAILToParseRecUsername" rc="8112" message= "Failed to parse the target account ID to perform a reconciliation" />
+
+	</Fails>
+
+	<Chains>
+		<!-- Verify Action -->
+		<Chain name="verifypass">
+			<Link name="VerifyPasswordLink" request="GetToken">
+				<StatusCode value="200" next="END">
+					<Parse name="parsed/token" type="json" value="token" secure="true"/>
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorized"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+		</Chain>
+		<!--Change Action -->
+		<Chain name="changepass">
+			<Link name="ChangePasswordGetTokenLink" request="GetToken">
+				<StatusCode value="200" next="ChangePasswordLink">
+					<Parse name="parsed/token" type="json" value="token" secure="true"/>
+					<Parse name="parsed/id" type="json" value="id" secure="false"/>
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorizedCurrPass"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+			<Link name="ChangePasswordLink" request="ChangePassword">
+				<StatusCode value="200" next="VerifyNewPassLink"/>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorized"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+			<Link name="VerifyNewPassLink" request="GetToken">
+				<StatusCode value="200" next="END">
+					<Parse name="parsed/tokennew" type="json" value="token" secure="true" />
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorizedNewPass"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+
+		</Chain>
+			<!--Reconcile Action -->
+		<Chain name="reconcilepass">
+			<Link name="ReconcilePasswordGetTokenLink" request="RecGetToken">
+				<StatusCode value="200" next="GetUserByIDLink">
+					<Parse name="parsed/token" type="json" value="token" secure="true" />
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorizedCurrPass"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+			<Link name="GetUserByIDLink" request="GetUserByID">
+				<StatusCode value="200" next="ByParse" condition="OR" nomatch="FAILToParseRecUsername">
+					<Parse name="parsed/id" type="text" value="&quot;id&quot;:(\d+)(?=[^}]*&quot;userName&quot;:&quot;{{username}}&quot;)">
+						<Equals value="Success" next="END"/>
+						<Equals value="*" next="GetUserProfileByIDLink"/>
+					</Parse>
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorized"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+			<Link name="GetUserProfileByIDLink" request="GetUserProfileByID">
+				<StatusCode value="200" next="ReconcilePasswordLink">
+					<!-- Uses method=lowercase as we later treat it as a bool. Works with at least v12.5.7.3 of WSChains.dll-->
+					<Parse name="parsed/active" type="json" value="active" method="lowercase"/>
+					<Parse name="parsed/defaultLanguage" type="json" value="defaultLanguage" />
+					<Parse name="parsed/emailAddress" type="json" value="emailAddress" />
+					<Parse name="parsed/firstName" type="json" value="firstName" />
+					<!-- Use regex to get the value of the groups key as when we parse it as type json, it cannot convert an Array to string. -->
+					<Parse name="parsed/groups" type="text" value="&quot;groups&quot;:(\[[^\]]+\])" />
+					<Parse name="parsed/lastName" type="json" value="lastName" />
+					<Parse name="parsed/merchant" type="json" value="merchant" />
+					<Parse name="parsed/username" type="json" value="userName" />
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorized"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+			<Link name="ReconcilePasswordLink" request="RecChangePassword">
+				<StatusCode value="200" next="RecVerifyNewPassLink"/>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorized"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+			<Link name="RecVerifyNewPassLink" request="GetToken">
+				<StatusCode value="200" next="END">
+					<Parse name="parsed/tokennew" type="json" value="token" secure="true"/>
+				</StatusCode>
+				<StatusCode value="400" next="FAILBadRequest"/>
+				<StatusCode value="401" next="FAILUnauthorizedNewPass"/>
+				<StatusCode value="403" next="FAILForbidden"/>
+				<StatusCode value="404" next="FAILNotFound"/>
+				<StatusCode value="405" next="FAILMethodNotFound"/>
+				<StatusCode value="409" next="FAILRequestConflict"/>
+				<StatusCode value="500" next="FAILInternalServerError"/>
+				<StatusCode value="501" next="FAILWebServer"/>
+				<StatusCode value="*" next="FAILGeneral"/>
+			</Link>
+		</Chain>
+	</Chains>
+</WSChains>

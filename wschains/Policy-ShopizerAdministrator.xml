@@ -1,0 +1,17 @@
+<Device Name="Website">
+	<Policies>
+		<Policy ID="ShopizerAdministrator" PlatformBaseID="WSChains" PlatformBaseType="WSChains" PlatformBaseProtocol="HTTPS" AutoChangeOnAdd="No" AutoVerifyOnAdd="No">
+			<Properties>
+				<Required>
+					<Property Name="Address" />
+					<Property Name="Username" />
+				</Required>
+				<Optional></Optional>
+			</Properties>
+			<LinkedPasswords>
+				<Link Name="ReconcileAccount" PropertyIndex="3" />
+			</LinkedPasswords>
+			<TicketingSystem EnterTicketingInfo="No" ValidateTicketNumber="No" />
+		</Policy>
+	</Policies>
+</Device>
