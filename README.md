@@ -27,7 +27,7 @@ The CPM plugin is found in the `cpm` folder. It contains the following files:
 
 ## CyberArk CPM plugin (API using WSChains)
 
-This is a WSChains-based plugin that interacts with the Shopizer Administrator portal.
+This is a WSChains-based plugin that interacts with the Shopizer Administrator portal, developed for the article [Creating a CyberArk Central Policy Manager plugin for a web application using WSChains](https://timschindler.blog/creating-a-cyberark-central-policy-manager-plugin-for-a-web-application-using-wschains).
 
 The CPM plugin is found in the `wschains` folder. It contains the following files:
 
