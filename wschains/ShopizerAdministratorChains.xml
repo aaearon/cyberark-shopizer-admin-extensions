@@ -54,6 +54,29 @@ File:				Chains
 			  </body>
 			</request>
 		</RequestWrapper>
+		<!-- We need this as at the end of changepass and reconcilepass, we login with the new password to double-check the password has been set as we've intended. -->
+		<RequestWrapper>
+			<request name="GetTokenWithNewPass">
+			<version>2</version>
+			  <general>
+				<endpoint>/api/v1/private/login</endpoint>
+				<method>POST</method>
+			  </general>
+			  <header>
+				<Content-Type>application/json</Content-Type>
+				<Accept>application/json</Accept>
+				<User-Agent>Integration/1.0 (CyberArk, CPM, 1)</User-Agent>
+			  </header>
+			  <body>
+				<json>
+					{
+						"username":"{{username}}",
+						"password":"{{pmnewpass}}"
+					}
+				</json>
+			  </body>
+			</request>
+		</RequestWrapper>
 		<RequestWrapper>
 			<request name="GetUserByID">
 			<version>2</version>
@@ -120,7 +143,7 @@ File:				Chains
 					"password": "{{pmnewpass}}",
 					"repeatPassword": "{{pmnewpass}}",
 					"store": "{{parsed/merchant}}",
-					"emailAddress": "shopizeradministrator@timschindler.dev",
+					"emailAddress": "{{parsed/emailAddress}}",
 					"userName": "{{parsed/userName}}"
 				}
 				</json>
@@ -217,7 +240,7 @@ File:				Chains
 				<StatusCode value="501" next="FAILWebServer"/>
 				<StatusCode value="*" next="FAILGeneral"/>
 			</Link>
-			<Link name="VerifyNewPassLink" request="GetToken">
+			<Link name="VerifyNewPassLink" request="GetTokenWithNewPass">
 				<StatusCode value="200" next="END">
 					<Parse name="parsed/tokennew" type="json" value="token" secure="true" />
 				</StatusCode>
@@ -301,7 +324,7 @@ File:				Chains
 				<StatusCode value="501" next="FAILWebServer"/>
 				<StatusCode value="*" next="FAILGeneral"/>
 			</Link>
-			<Link name="RecVerifyNewPassLink" request="GetToken">
+			<Link name="RecVerifyNewPassLink" request="GetTokenWithNewPass">
 				<StatusCode value="200" next="END">
 					<Parse name="parsed/tokennew" type="json" value="token" secure="true"/>
 				</StatusCode>
