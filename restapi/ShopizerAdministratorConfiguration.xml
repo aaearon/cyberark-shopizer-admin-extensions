@@ -1,0 +1,140 @@
+﻿<RestPlugin>
+    <Parameters>
+        <Parameter name="AddressWithValidation" validationPattern="{{AddressValidationPattern}}">{{Address}}</Parameter>
+        <Parameter name="LogonURL">http://{{AddressWithValidation}}:{{Port}}/api/v1/private/login</Parameter>
+    </Parameters>
+
+    <ErrorMessages/>
+
+    <APICalls>
+        <APICall>
+            <Request name="Logon" method="POST">
+                <URL>{{LogonURL}}</URL>
+                <Headers>
+                    <Header key="Content-Type">application/json</Header>
+                </Headers>
+                <Body>
+					{
+					"username": "{{reconcileaccountORtargetaccount\username}}",
+					"password": "{{reconcileaccountORtargetaccount\password|JsonEscape}}"
+					}
+                </Body>
+            </Request>
+            <Responses>
+                <Response name="SuccessfulLogonResponse" type="valid" format="json" statusCode="200">
+                    <Parse>
+                        <ParseBody>
+                            <Parameter name="id" path="id" />
+                            <Parameter name="token" path="token" secure="true"/>
+                        </ParseBody>
+                    </Parse>
+                </Response>
+                <Response name="IncorrectPassword" type="error" statusCode="401">
+                    <Parse>
+                        <ParseBody>
+                            <Parameter name="ErrorMessage" path="message"/>
+                        </ParseBody>
+                    </Parse>
+                    <ErrorMessage name="IncorrectPasswordMsg" returnCode="2001" description="{{ErrorMessage}}"/>
+                </Response>
+            </Responses>
+        </APICall>
+        <APICall>
+            <Request name="ChangeAsTargetAccount" method="PATCH">
+                <URL>http://{{AddressWithValidation}}:{{Port}}/api/v1/private/user/{{id}}/password</URL>
+                <Headers>
+                    <Header key="Content-Type">application/json</Header>
+                    <Header key="Authorization">Bearer {{token}}</Header>
+                </Headers>
+                <Body>
+					{
+					"password": "{{password|JsonEscape}}",
+					"changePassword":"{{newpassword|JsonEscape}}"
+					}
+                </Body>
+            </Request>
+            <Responses>
+                <Response name="ValidChangeResponse" type="valid" statusCode="200"/>
+                <Response name="InternalErrorResponse" type="error" statusCode="500">
+                    <Parse>
+                        <ParseBody>
+                            <Parameter name="ErrorMessage" path="error"/>
+                        </ParseBody>
+                    </Parse>
+                    <ErrorMessage name="InternalErrorResponseMsg" returnCode="2002" description="{{ErrorMessage}}"/>
+                </Response>
+            </Responses>
+        </APICall>
+        <APICall>
+            <Request name="GetUsersInformation" method="GET">
+                <URL>http://{{AddressWithValidation}}:{{Port}}/api/v1/private/users</URL>
+                <Headers>
+                    <Header key="Content-Type">application/json</Header>
+                    <Header key="Authorization">Bearer {{token}}</Header>
+                </Headers>
+                <Body>
+                </Body>
+            </Request>
+            <Responses>
+                <Response name="ValidGetUsersInformationResponse" type="valid" format="json" statusCode="200">
+                    <Parse>
+                        <ParseBody>
+                            <Parameter name="targetaccount\id" path="..data[?(@.userName=='{{username}}')].id"/>
+                            <Parameter name="targetaccount\active" path="..data[?(@.userName=='{{username}}')].active"/>
+                            <Parameter name="targetaccount\defaultLanguage" path="..data[?(@.userName=='{{username}}')].defaultLanguage"/>
+                            <Parameter name="targetaccount\emailAddress" path="..data[?(@.userName=='{{username}}')].emailAddress"/>
+                            <Parameter name="targetaccount\firstName" path="..data[?(@.userName=='{{username}}')].firstName"/>
+                            <Parameter name="targetaccount\groups" path="..data[?(@.userName=='{{username}}')].groups"/>
+                            <Parameter name="targetaccount\lastName" path="..data[?(@.userName=='{{username}}')].lastName"/>
+                            <Parameter name="targetaccount\merchant" path="..data[?(@.userName=='{{username}}')].merchant"/>
+                            <Parameter name="targetaccount\username" path="..data[?(@.userName=='{{username}}')].userName"/>
+                        </ParseBody>
+                    </Parse>
+                </Response>
+                <Response name="InternalErrorResponse"/>
+            </Responses>
+        </APICall>
+        <APICall>
+            <Request name="RecChangePassword" method="PUT">
+                <URL>http://{{AddressWithValidation}}:{{Port}}/api/v1/private/user/{{targetaccount\id}}</URL>
+                <Headers>
+                    <Header key="Content-Type">application/json</Header>
+                    <Header key="Authorization">Bearer {{token}}</Header>
+                </Headers>
+                <Body>
+					{
+					"active": {{targetaccount\active}},
+					"defaultLanguage": "{{targetaccount\defaultLanguage}}",
+					"firstName": "{{targetaccount\firstName}}",
+					"groups:": {{targetaccount\groups}},
+					"lastName": "{{targetaccount\lastName}}",
+					"password": "{{newpassword}}",
+					"repeatPassword": "{{newpassword}}",
+					"store": "{{targetaccount\merchant}}",
+					"emailAddress": "{{targetaccount\emailAddress}}",
+					"userName": "{{targetaccount\username}}"
+					}
+                </Body>
+            </Request>
+            <Responses>
+                <Response name="ValidReconcileChangePasswordResponse" type="valid" statusCode="200"/>
+                <Response name="InternalErrorResponse"/>
+            </Responses>
+        </APICall>
+    </APICalls>
+
+    <Chains>
+        <Chain name="verifypass">
+            <Request name="Logon" />
+        </Chain>
+        <Chain name="changepass">
+            <Request name="Logon" />
+            <Request name="ChangeAsTargetAccount" />
+        </Chain>
+        <Chain name="reconcilepass">
+            <Request name="Logon" />
+            <Request name="GetUsersInformation" />
+            <Request name="RecChangePassword" />
+        </Chain>
+    </Chains>
+</RestPlugin>
