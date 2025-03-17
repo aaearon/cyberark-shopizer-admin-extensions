@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Device Name="Application"><Policies><Policy ID="TimSchindlerShopizerAdministratorAccountsviaRESTAPI" PlatformBaseID="SampleRestAPIPlatform" PlatformBaseType="SampleRestAPIPlatform" PlatformBaseProtocol="Rest" AutoChangeOnAdd="No" AutoVerifyOnAdd="No">
+          <Properties>
+            <Required>
+              <Property Name="Username" />
+              <Property Name="Address" />
+            </Required>
+            <Optional />
+          </Properties>
+          <LinkedPasswords>
+            <Link Name="ReconcileAccount" PropertyIndex="3" />
+            <Link Name="LogonAccount" PropertyIndex="1" />
+          </LinkedPasswords>
+          <TicketingSystem EnterTicketingInfo="No" ValidateTicketNumber="No" />
+        </Policy></Policies></Device>

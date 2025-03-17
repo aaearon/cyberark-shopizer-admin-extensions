@@ -1,7 +1,8 @@
 ﻿<RestPlugin>
+
     <Parameters>
         <Parameter name="AddressWithValidation" validationPattern="{{AddressValidationPattern}}">{{Address}}</Parameter>
-        <Parameter name="LogonURL">http://{{AddressWithValidation}}:{{Port}}/api/v1/private/login</Parameter>
+        <Parameter name="AddressWithValidationAndPort">http://{{AddressWithValidation}}:{{Port}}</Parameter>
     </Parameters>
 
     <ErrorMessages/>
@@ -9,7 +10,7 @@
     <APICalls>
         <APICall>
             <Request name="Logon" method="POST">
-                <URL>{{LogonURL}}</URL>
+                <URL>{{AddressWithValidationAndPort}}/api/v1/private/login</URL>
                 <Headers>
                     <Header key="Content-Type">application/json</Header>
                 </Headers>
@@ -41,7 +42,7 @@
         </APICall>
         <APICall>
             <Request name="ChangeAsTargetAccount" method="PATCH">
-                <URL>http://{{AddressWithValidation}}:{{Port}}/api/v1/private/user/{{id}}/password</URL>
+                <URL>{{AddressWithValidationAndPort}}/api/v1/private/user/{{id}}/password</URL>
                 <Headers>
                     <Header key="Content-Type">application/json</Header>
                     <Header key="Authorization">Bearer {{token}}</Header>
@@ -67,13 +68,12 @@
         </APICall>
         <APICall>
             <Request name="GetUsersInformation" method="GET">
-                <URL>http://{{AddressWithValidation}}:{{Port}}/api/v1/private/users</URL>
+                <URL>{{AddressWithValidationAndPort}}/api/v1/private/users</URL>
                 <Headers>
                     <Header key="Content-Type">application/json</Header>
                     <Header key="Authorization">Bearer {{token}}</Header>
                 </Headers>
-                <Body>
-                </Body>
+                <Body></Body>
             </Request>
             <Responses>
                 <Response name="ValidGetUsersInformationResponse" type="valid" format="json" statusCode="200">
@@ -95,8 +95,8 @@
             </Responses>
         </APICall>
         <APICall>
-            <Request name="RecChangePassword" method="PUT">
-                <URL>http://{{AddressWithValidation}}:{{Port}}/api/v1/private/user/{{targetaccount\id}}</URL>
+            <Request name="ChangeAsReconcileAccount" method="PUT">
+                <URL>{{AddressWithValidationAndPort}}/api/v1/private/user/{{targetaccount\id}}</URL>
                 <Headers>
                     <Header key="Content-Type">application/json</Header>
                     <Header key="Authorization">Bearer {{token}}</Header>
@@ -134,7 +134,8 @@
         <Chain name="reconcilepass">
             <Request name="Logon" />
             <Request name="GetUsersInformation" />
-            <Request name="RecChangePassword" />
+            <Request name="ChangeAsReconcileAccount" />
         </Chain>
     </Chains>
+
 </RestPlugin>
