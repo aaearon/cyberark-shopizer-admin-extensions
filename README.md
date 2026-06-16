@@ -1,8 +1,8 @@
 # cyberark-shopizer-admin-extensions
 
-CyberArk PSM connector and CPM plugins for the Shopizer Administrator portal. These extensions were created as part of a [blog series](https://timschindler.blog/series/shopizer-admin-ext) that can be found at [https://timschindler.blog](https://timschindler.blog).
+Idira (formerly CyberArk) PSM connector and CPM plugins for the Shopizer Administrator portal. These extensions were created as part of a [blog series](https://timschindler.blog/series/shopizer-admin-ext) that can be found at [https://timschindler.blog](https://timschindler.blog).
 
-## CyberArk PSM connection component
+## Idira PSM connection component
 
 Developed as part of the article [Creating a CyberArk Privileged Session Manager connection component for a web application](https://timschindler.blog/creating-a-cyberark-privileged-session-manager-connection-component-for-a-web-application).
 
@@ -12,7 +12,7 @@ The PSM connector is found in the `psm` folder. It contains the following file:
 
 `CC-PSM-ShopizerAdministrator.xml` can be used to create a PSM connection component package and the package be imported via the PVWA. `New-PASConnectionComponentPackage` as part of [`New-PASExtensions`](https://github.com/aaearon/New-PASExtensions) can be used to easily create a platform package from these files.
 
-## CyberArk CPM plugin (Web Application framework)
+## Idira CPM plugin (Web Application framework)
 
 Developed as part of the article [Creating a CyberArk Central Policy Manager plugin for a web application](https://timschindler.blog/creating-a-cyberark-central-policy-manager-plugin-for-a-web-application).
 
@@ -25,7 +25,7 @@ The CPM plugin is found in the `cpm` folder. It contains the following files:
 
 `Policy-TimSchindlerShopizerAdministratorAccounts.ini`, `Policy-TimSchindlerShopizerAdministratorAccounts.xml`, and `ShopizerAdministrator.ini` can be combined into a platform package and imported via the PVWA. `New-PASPlatformPackage` as part of [`New-PASExtensions`](https://github.com/aaearon/New-PASExtensions) can be used to easily create a platform package from these files.
 
-## CyberArk CPM plugin (API using WSChains)
+## Idira CPM plugin (API using WSChains)
 
 This is a WSChains-based plugin that interacts with the Shopizer Administrator portal via API, developed for the article [Creating a CyberArk Central Policy Manager plugin for an API using WSChains](https://timschindler.blog/creating-a-cyberark-central-policy-manager-plugin-for-an-api-using-wschains).
 
@@ -39,7 +39,7 @@ The CPM plugin is found in the `wschains` folder. It contains the following file
 
 `Policy-ShopizerAdministrator.ini`, `Policy-ShopizerAdministrator.xml`, `ShopizerAdministratorChains.xml`, and `Cyberark.Extensions.Plugin.WSChains.dll` can be combined into a platform package and imported via the PVWA. `New-PASPlatformPackage` as part of [`New-PASExtensions`](https://github.com/aaearon/New-PASExtensions) can be used to easily create a platform package from these files.
 
-## CyberArk CPM plugin (API using the REST API framework)
+## Idira CPM plugin (API using the REST API framework)
 
 This is a REST API framework that interacts with the Shopizer Administrator portal via API, developed for the article [Creating a CyberArk Central Policy Manager plugin for an API using the new REST API framework](https://timschindler.blog/creating-a-cyberark-central-policy-manager-plugin-for-an-api-using-the-new-rest-api-framework).
 
